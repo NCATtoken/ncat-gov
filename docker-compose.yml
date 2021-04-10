@@ -1,0 +1,47 @@
+version: "3"
+services:
+  db:
+    image: postgres:12.6-alpine
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password
+      - APP_DB_USER=docker
+      - APP_DB_PASS=docker
+      - APP_DB_NAME=docker
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/
+    ports:
+      - "5432:5432"
+  client:
+    image: node:14.15.5-alpine
+    working_dir: /app
+    command: sh -c "npm i && npm run start"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "8080:8080"
+  api:
+    image: node:14.15.5-alpine
+    working_dir: /app
+    command: sh -c "npm i && npm run start:dev"
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    depends_on:
+      - db
+    environment:
+      - IS_DOCKER=true
+      - NODE_OPTIONS=--max-old-space-size=4096
+      - NODE_ENV=local
+      - DB_NAME=docker
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=docker
+      - DB_PASSWORD=docker
+    restart: always
+    ports:
+      - "3000:3000"
