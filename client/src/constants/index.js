@@ -1,6 +1,6 @@
 module.exports = {
   api: {
-    baseURL: "http://localhost:3000/",
-    proposals: "/proposals",
+    baseURL: process.env.REACT_APP_API_BASE_URL,
+    proposals: process.env.REACT_APP_API_PROPOSALS,
   },
 };

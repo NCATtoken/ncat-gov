@@ -27,9 +27,16 @@ app.use(morgan("combined", { stream: accessLogStream }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, '../assets')));
 
 // routes
 require("./routes")(app, logger);
+
+
+// home
+app.get('/', (req, res) => {
+  res.send('Version 0.1')
+})
 
 // Synchronize DB
 models.sequelize.sync().then(async () => {
