@@ -31,6 +31,12 @@ app.use(express.urlencoded({ extended: false }));
 // routes
 require("./routes")(app, logger);
 
+
+// home
+app.get('/', (req, res) => {
+  res.send('Version 0.1')
+})
+
 // Synchronize DB
 models.sequelize.sync().then(async () => {
   listeners.enableAll();
