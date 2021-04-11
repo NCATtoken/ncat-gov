@@ -11,7 +11,7 @@ const DECIMALS = config.get("blockchain.ncat.decimals");
 
 const { MIN_PROPOSAL_BALANCE } = require("../models/User");
 const { BigNumber } = require("ethers");
-const { PROPOSAL_STATES } = require("../models/Proposal");
+const { PROPOSAL_STATES, PROPOSAL_EXPIRATION_PERIOD } = require("../models/Proposal");
 const logger = require("../utils/logger");
 
 const findAllByPage = (page) => repository.findAllByPage(page);
@@ -39,6 +39,7 @@ const save = async (proposal) => {
         title: proposal.title,
         author: proposal.author,
         content: proposal.content,
+        expiration: new Date(new Date().getTime() + PROPOSAL_EXPIRATION_PERIOD),
       },
       t
     );
