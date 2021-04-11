@@ -12,5 +12,8 @@
   color: white;
 }
 
-.New-Proposal {
+.New-Proposal {}
+
+.makeStyles-paper-2 {
+  min-width: 300px !important;
 }
