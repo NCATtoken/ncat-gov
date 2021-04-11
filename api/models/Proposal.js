@@ -8,11 +8,12 @@ const PROPOSAL_STATES = {
   REJECTED: "REJECTED",
 };
 
-const ONE_WEEK_MS = 1000 * 60 * 60 * 24 * 7;
+const PROPOSAL_EXPIRATION_PERIOD = 1000 * 60 * 60 * 24 * 7; // 1 week
 const ZERO_BN = BigNumber.from(0);
 
 module.exports = {
   PROPOSAL_STATES,
+  PROPOSAL_EXPIRATION_PERIOD,
   model: (sequelize) => {
     class Proposal extends Model {}
 
@@ -46,7 +47,9 @@ module.exports = {
         },
         expiration: {
           type: DataTypes.DATE,
-          defaultValue: new Date(new Date().getTime() + ONE_WEEK_MS),
+          defaultValue: new Date(
+            new Date().getTime() + PROPOSAL_EXPIRATION_PERIOD
+          ),
         },
         voters: {
           type: DataTypes.ARRAY(DataTypes.STRING),
