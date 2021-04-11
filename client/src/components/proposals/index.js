@@ -20,6 +20,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import _ from "lodash"
+import { Divider } from '@material-ui/core';
 
 const { api } = require("../../constants");
 
@@ -61,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
     // b97ea1
   },
   header: {
-    color: "#64618B", 
+    color: "#64618B",
     fontWeight: 700
   },
 }));
@@ -167,9 +168,8 @@ function Proposals({ address }) {
 
   return (
     <div className="Proposals" ref={componentRef}>
-      <NewProposalModal address={address} saveProposal={saveProposal}/>
-      <hr />
-      <br/>
+      <NewProposalModal address={address} saveProposal={saveProposal} />
+      <Divider style={{ margin: "1em auto" }}></Divider>
       <Typography variant="h6" className={classes.header} gutterBottom>
         Proposals
       </Typography>
@@ -178,15 +178,16 @@ function Proposals({ address }) {
         next={fetchData}
         hasMore={hasMore}
         loader={<CircularProgress />}
+        style={{ height: "default", overflow: "hidden" }}
         endMessage={
-          <Typography style={{color: "#64618B"}} gutterBottom>
+          <Typography style={{ color: "#64618B", margin: "1em 0" }} gutterBottom>
             No more proposals.
           </Typography>
         }
       >
-        <GridList cellHeight={"auto"} style={{overflow: "visible"}} cols={getGridListCols()}>
+        <GridList cellHeight={"auto"} style={{ overflow: "hidden" }} cols={getGridListCols()}>
           {proposals.map((proposal, index) => (
-            <GridListTile style={{padding:"10px", overflow: "visible"}} key={index} cols={1}>
+            <GridListTile style={{ padding: "10px", overflow: "visible" }} key={index} cols={1}>
               <Proposal
                 key={index}
                 address={address}
@@ -197,7 +198,7 @@ function Proposals({ address }) {
             </GridListTile>
           ))}
         </GridList>
-        
+
       </InfiniteScroll>
 
       <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open={openSuccess} autoHideDuration={6000} onClose={handleCloseSuccess}>
@@ -224,13 +225,14 @@ function NewProposalModal({ address, saveProposal }) {
   });
   const [openModal, setOpenModal] = useState(false)
   const open = () => setOpenModal(true)
-  
+
   const close = () => {
     setOpenModal(false)
     setNewProposal({
       author: address,
       title: "",
-      content: "",})
+      content: "",
+    })
   }
 
   const handleChange = (attr, e) => {
@@ -239,7 +241,7 @@ function NewProposalModal({ address, saveProposal }) {
 
   return (
     <>
-      <Button className={classes.create} style={{width:"100%", fontWeight: 800}} onClick={open}>Create new proposal</Button>
+      <Button className={classes.create} style={{ fontWeight: 800 }} onClick={open}>Create new proposal</Button>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -255,35 +257,35 @@ function NewProposalModal({ address, saveProposal }) {
         <Fade in={openModal}>
           <div className={classes.paper}>
             <div className="Proposals">
-            <Typography variant="h6" className={classes.header} gutterBottom>
-              Create New Proposal:
+              <Typography variant="h6" className={classes.header} gutterBottom>
+                Create New Proposal:
             </Typography>
-            <div className="New-Proposal" noValidate autoComplete="off">
-              <TextInput
-                style={{width:"95%", marginRight:"10px"}}
-                placeholder="Title"
-                value={newProposal.title}
-                onChange={(e) => {
-                  handleChange("title", e);
-                }}
-              />
-              <br />
-              <br />
-              <TextInput
-                multiline
-                style={{width:"95%", marginRight:"10px", height:"auto"}}
-                placeholder="Content"
-                value={newProposal.content}
-                onChange={(e) => {
-                  handleChange("content", e);
-                }}
-                multiline
-              />
-              <br />
-              <br />
-              <Button className={classes.create} onClick={() => { saveProposal(newProposal); close()}}>Create</Button>
+              <div className="New-Proposal" noValidate autoComplete="off">
+                <TextInput
+                  style={{ width: "95%", marginRight: "10px" }}
+                  placeholder="Title"
+                  value={newProposal.title}
+                  onChange={(e) => {
+                    handleChange("title", e);
+                  }}
+                />
+                <br />
+                <br />
+                <TextInput
+                  multiline
+                  style={{ width: "95%", marginRight: "10px", height: "auto" }}
+                  placeholder="Content"
+                  value={newProposal.content}
+                  onChange={(e) => {
+                    handleChange("content", e);
+                  }}
+                  multiline
+                />
+                <br />
+                <br />
+                <Button className={classes.create} onClick={() => { saveProposal(newProposal); close() }}>Create</Button>
+              </div>
             </div>
-          </div>
           </div>
         </Fade>
       </Modal>

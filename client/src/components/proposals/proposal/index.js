@@ -33,6 +33,9 @@ import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
 import { Text, TextInput, Timer } from '@aragon/ui'
 import { Distribution } from 'ui'
+import Address from "../../address";
+import { round } from 'lodash';
+
 // import Distribution from '../../distribution'
 const { api } = require("../../../constants");
 const { BigNumber } = require("ethers");
@@ -47,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "56.25%", // 16:9
   },
   box: {
-    borderRadius:"25px"
+    borderRadius: "25px"
   },
   expand: {
     transform: "rotate(0deg)",
@@ -70,23 +73,35 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: red[500],
   },
   title: {
-    color: "#64618B", 
-    fontWeight:"600", 
-    fontSize: "13pt", 
-    textAlign: "center", 
-    margin:"auto", 
-    marginLeft:'0',
-    marginTop: '0'
+    color: "#64618B",
+    fontWeight: "600",
+    fontSize: "13pt",
+    textAlign: "center",
+    margin: "auto",
+    marginLeft: '0',
+    marginTop: '0',
+    textAlign: "left",
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
   },
   pending: {
-    height:"20px", 
-    marginBottom:"10px", 
-    color:"white", 
-    background: "linear-gradient( 190deg, #BEA5A9 -100%, #ddc7cb 80%)"
+    marginLeft: "5px",
+    color: "white",
+    padding: "5px",
+    borderRadius: "3px",
+    height: "20px",
+    lineHeight: "20px",
+    background: "linear-gradient( 190deg, #BEA5A9 -100%, #faabbe 80%)"
   },
   inactive: {
-    height:"20px", 
-    marginBottom:"10px", 
+    marginLeft: "5px",
+    color: "white",
+    padding: "5px",
+    borderRadius: "3px",
+    height: "20px",
+    lineHeight: "20px",
+    background: "linear-gradient( 190deg, #BEA5A9 -100%, #ddc7cb 80%)"
   },
   for: {
     color: "white",
@@ -107,7 +122,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgba(0,0,0,0)",
     border: 'none',
     margin: 'none',
-    padding: 'none'
+    padding: 'none',
+    width: "100%", height: "100px", padding: '0px', overflowY: "auto", textAlign: "left", fontSize: "0.8em", lineHeight: "1.25em",
   }
 }));
 
@@ -150,48 +166,47 @@ function Proposal({ address, proposal, refresh }) {
   return (
     <Box className={classes.box} heading={<Fragment>
       <h4 className={classes.title}>{proposal.title}</h4>
-      <span style={{marginLeft:'auto', marginTop:"21px", marginBottom:"21px"}}><h6>
-        Status: <span style={{color: "#e07891"}}>{proposal.state === "PENDING" ? <Button mode="strong" size="mini" className={clsx(classes.pending)} disabled>Pending</Button> : <Button size="mini" className={clsx(classes.inactive)} disabled>Inactive</Button>}</span>
-      </h6></span>
+      <div style={{ whiteSpace: "nowrap", margin: "21px 0 21px 21px" }}><h6>
+        Status:
+          {proposal.state === "PENDING" ?
+          <span className={classes.pending}>Pending</span>
+          :
+          <span className={classes.inactive}>Inactive</span>
+        }
+      </h6></div>
     </Fragment>}>
-      
-      <CardContent className={proposal.state === "PENDING" ? classes.cardContent : null} style={{paddingTop: "0px"}}>
-        { proposal.state === "PENDING" && (
-          <div style={{display: 'flex', flexWrap: 'wrap'}}>
-            <div style={{flexBasis: '50%', color: "#64618B", fontSize: "7pt", alignContent: 'center', margin:'auto'}}> <Timer style={{margin:'auto'}}end={new Date(proposal.expiration)}/></div>
+
+      <CardContent className={proposal.state === "PENDING" ? classes.cardContent : null} style={{ padding: "0 0 1em 0" }}>
+        {proposal.state === "PENDING" && (
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            <div style={{ flexBasis: '50%', color: "#64618B", fontSize: "7pt", alignContent: 'center', marginBottom: '2em' }}> <Timer style={{ margin: 'auto' }} end={new Date(proposal.expiration)} /></div>
           </div>)
         }
-        <br/>
-        <br/>
-        <TextInput
-          multiline
-          className={classes.content}
-          style={{width:"100%", height:"100px", padding: '0px'}}
-          value={proposal.content}
-          rowsMax={5}
-          disabled
-        />
+        <div className={classes.content}>
+          <b>{proposal.title}</b><br />
+          {proposal.content}
+        </div>
         <Distribution
           heading="Votes"
           items={[
-            { item: `${BigNumber.from(proposal.for).toString()} For`, percentage: totalVotes > 0 ? (BigNumber.from(proposal.for)/totalVotes)*100 : 0 },
-            { item: `${BigNumber.from(proposal.against).toString()} Against`, percentage: totalVotes > 0 ? (BigNumber.from(proposal.against)/totalVotes)*100 : 0}
+            { item: `${round(BigNumber.from(proposal.for) / 10e17, 2).toString()}B For`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.for) / totalVotes) * 100) : 0 },
+            { item: `${round(BigNumber.from(proposal.against) / 10e17, 2).toString()}B Against`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.against) / totalVotes) * 100) : 0 }
           ]}
           colors={["#E17992", "#425673"]}
         />
       </CardContent>
 
-      {proposal.state === "PENDING" ? 
+      {proposal.state === "PENDING" ?
         (!proposal.voters.includes(address.toLowerCase()) ? (
-        <div style={{display: 'flex', flexWrap: 'wrap'}}>
-          <div style={{flexBasis: '48%', margin: "1%"}}>
-            <Button className={clsx(classes.for)} size="mini" style={{width:"100%", padding:"2px", margin:"2px"}} onClick={() => vote(true)}>For</Button></div>
-          <div style={{flexBasis: '48%', margin: "1%"}}>
-            <Button className={clsx(classes.against)} size="mini" style={{width:"100%", padding:"2px", margin:"2px"}} onClick={() => vote(false)}>Against</Button>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            <div style={{ flexBasis: '48%', margin: "1%" }}>
+              <Button className={clsx(classes.for)} size="mini" style={{ width: "100%", padding: "2px", margin: "2px" }} onClick={() => vote(true)}>For</Button></div>
+            <div style={{ flexBasis: '48%', margin: "1%" }}>
+              <Button className={clsx(classes.against)} size="mini" style={{ width: "100%", padding: "2px", margin: "2px" }} onClick={() => vote(false)}>Against</Button>
+            </div>
           </div>
-        </div>
-        ): <Button size="mini" style={{width:"100%", padding:"2px", margin: "1.6%"}} disabled>Voted</Button>)
-        : <Button size="mini" style={{width:"100%", padding:"2px", margin: "1.6%"}} disabled>Inactive</Button>
+        ) : <Button size="mini" style={{ width: "100%", padding: "2px", margin: "1.6%" }} disabled>Voted</Button>)
+        : <Button size="mini" style={{ width: "100%", padding: "2px", margin: "1.6%" }} disabled>Inactive</Button>
       }
 
       <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open={openSuccess} autoHideDuration={6000} onClose={handleCloseSuccess}>
@@ -202,18 +217,18 @@ function Proposal({ address, proposal, refresh }) {
 
       <Snackbar anchorOrigin={{ vertical: "bottom", horizontal: "right" }} open={openError} autoHideDuration={6000} onClose={handleCloseError}>
         <Alert onClose={handleCloseError} severity="error">
-          Error submitting voting
+          Error: {error}
         </Alert>
       </Snackbar>
 
 
-      <CardActions disableSpacing>
-        <div
-          className={clsx(classes.expand)}
-        >
-          View Voters
+      <CardActions style={{ padding: "0" }}>
+        <div className={clsx(classes.expand)}>
+          <Typography variant="caption">
+            View Voters
+          </Typography>
         </div>
-         
+
         <IconButton
           className={clsx(classes.expandSmall, {
             [classes.expandOpen]: expanded,
@@ -222,30 +237,30 @@ function Proposal({ address, proposal, refresh }) {
           aria-expanded={expanded}
           aria-label="show more"
         >
-         <ExpandMoreIcon />
+          <ExpandMoreIcon />
         </IconButton>
       </CardActions>
-      <Collapse in={expanded} timeout="auto" style={{padding: "none"}} unmountOnExit>
-      <CardContent style={{backgroundColor:"#fafafa", padding: "0px"}}>
-      <TableContainer component={Paper}>
-        <Table className={classes.table} aria-label="simple table">
-          <TableBody>
-            {proposal.voters.length > 0 ? 
+      <Collapse in={expanded} timeout="auto" unmountOnExit>
+        <CardContent style={{ padding: "0px", textAlign: "left", maxHeight: "120px", overflowY: "auto" }}>
+          <Typography variant="caption">
+            {proposal.voters.length > 0 ?
               proposal.voters.map(voter => (
-                <TableRow key={voter}>
-                  <TableCell>
-                  <Text style={{fontSize: "10pt"}}>{voter}</Text>
-                  </TableCell>
-                </TableRow>
+                <Fragment>
+                  <Address address={voter}></Address>
+                  <Divider></Divider>
+                </Fragment>
+                // <TableRow key={voter}>
+                //   <TableCell>
+                //     {/* <Text style={{ fontSize: "10pt" }}>{voter}</Text> */}
+                //   </TableCell>
+                // </TableRow>
               ))
               : <Text>No voters yet</Text>
             }
-          </TableBody>
-        </Table>
-      </TableContainer>
-      </CardContent>
-    </Collapse>
-    </Box>
+          </Typography>
+        </CardContent>
+      </Collapse>
+    </Box >
   );
 }
 
