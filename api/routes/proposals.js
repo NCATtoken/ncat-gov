@@ -52,7 +52,6 @@ router.post(
 );
 
 router.get("/vote", async (req, res, next) => {
-  // TODO!! : need to get signature here to assert that voter is actually the voter
   const voter = req.query.address.trim().toLowerCase();
   const proposalId = req.query.proposalId;
   let support = req.query.support;
