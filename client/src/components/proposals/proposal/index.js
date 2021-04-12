@@ -189,8 +189,8 @@ function Proposal({ address, proposal, refresh }) {
         <Distribution
           heading="Votes"
           items={[
-            { item: `${round(BigNumber.from(proposal.for) / 10e17, 2).toString()}B For`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.for) / totalVotes) * 100) : 0 },
-            { item: `${round(BigNumber.from(proposal.against) / 10e17, 2).toString()}B Against`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.against) / totalVotes) * 100) : 0 }
+            { item: `${round(BigNumber.from(proposal.for) / 10e19, 2).toString()}T For`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.for) / totalVotes) * 100) : 0 },
+            { item: `${round(BigNumber.from(proposal.against) / 10e19, 2).toString()}T Against`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.against) / totalVotes) * 100) : 0 }
           ]}
           colors={["#E17992", "#425673"]}
         />
@@ -225,7 +225,7 @@ function Proposal({ address, proposal, refresh }) {
       <CardActions style={{ padding: "0" }}>
         <div className={clsx(classes.expand)}>
           <Typography variant="caption">
-            View Voters
+            View Voters ({proposal.voters.length})
           </Typography>
         </div>
 
