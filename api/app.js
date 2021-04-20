@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 
 // Synchronize DB
 models.sequelize.sync().then(async () => {
-  listeners.enableAll();
+  //listeners.enableAll();
   jobs.startAll();
   app.listen(appPort, () => {
     logger.info(`App is listening on port ${appPort}`);
