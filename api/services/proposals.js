@@ -39,7 +39,6 @@ const save = async (proposal) => {
         title: proposal.title,
         author: proposal.author,
         content: proposal.content,
-        expiration: new Date(new Date().getTime() + PROPOSAL_EXPIRATION_PERIOD),
       },
       t
     );

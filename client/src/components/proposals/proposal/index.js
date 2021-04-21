@@ -101,7 +101,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "3px",
     height: "20px",
     lineHeight: "20px",
-    background: "linear-gradient( 190deg, #BEA5A9 -100%, #ddc7cb 80%)"
+    background: "linear-gradient( 190deg, #BEA5A9 -100%, #ddc7cb 80%)",
   },
   for: {
     color: "white",
@@ -165,13 +165,13 @@ function Proposal({ address, proposal, refresh }) {
 
   return (
     <Box className={classes.box} heading={<Fragment>
-      <h4 className={classes.title}>{proposal.title}</h4>
+      <div className={classes.title}>{proposal.title}</div>
       <div style={{ whiteSpace: "nowrap", margin: "21px 0 21px 21px" }}><h6>
         Status:
           {proposal.state === "PENDING" ?
           <span className={classes.pending}>Pending</span>
           :
-          <span className={classes.inactive}>Inactive</span>
+          <span className={clsx(classes.inactive, proposal.state === "ACCEPTED" ? classes.for : classes.against)}>{proposal.state}</span>
         }
       </h6></div>
     </Fragment>}>
@@ -244,16 +244,11 @@ function Proposal({ address, proposal, refresh }) {
         <CardContent style={{ padding: "0px", textAlign: "left", maxHeight: "120px", overflowY: "auto" }}>
           <Typography variant="caption">
             {proposal.voters.length > 0 ?
-              proposal.voters.map(voter => (
-                <Fragment>
+              proposal.voters.map((voter, index) => (
+                <Fragment key={index}>
                   <Address address={voter}></Address>
                   <Divider></Divider>
                 </Fragment>
-                // <TableRow key={voter}>
-                //   <TableCell>
-                //     {/* <Text style={{ fontSize: "10pt" }}>{voter}</Text> */}
-                //   </TableCell>
-                // </TableRow>
               ))
               : <Text>No voters yet</Text>
             }

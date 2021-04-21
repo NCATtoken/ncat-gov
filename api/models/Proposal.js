@@ -15,7 +15,7 @@ module.exports = {
   PROPOSAL_STATES,
   PROPOSAL_EXPIRATION_PERIOD,
   model: (sequelize) => {
-    class Proposal extends Model {}
+    class Proposal extends Model { }
 
     Proposal.init(
       {
@@ -47,7 +47,7 @@ module.exports = {
         },
         expiration: {
           type: DataTypes.DATE,
-          defaultValue: new Date(
+          defaultValue: () => new Date(
             new Date().getTime() + PROPOSAL_EXPIRATION_PERIOD
           ),
         },
