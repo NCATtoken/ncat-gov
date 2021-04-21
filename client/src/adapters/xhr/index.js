@@ -3,13 +3,6 @@ import axios from "axios";
 const { api } = require("../../constants");
 
 function returnAxiosInstance() {
-  console.log({
-    baseURL: api.baseURL,
-    timeout: 5 * 60 * 1000 /* 5m */,
-    headers: {
-      'Authorization': 'Bearer ' + api.token,
-    }
-  });
   return axios.create({
     baseURL: api.baseURL,
     timeout: 5 * 60 * 1000 /* 5m */,
