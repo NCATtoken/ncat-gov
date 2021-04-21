@@ -1,14 +1,15 @@
+import { Button, Header, ToastHub } from '@aragon/ui';
+import Container from '@material-ui/core/Container';
+import Typography from "@material-ui/core/Typography";
 import { Fragment, useEffect, useState } from "react";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
+import { get } from './adapters/xhr';
 import "./App.css";
-import Proposals from "./components/proposals";
 import Address from "./components/address";
-import { Main, ToastHub, Button, Header, textStyle } from '@aragon/ui'
+import Proposals from "./components/proposals";
 
-import Typography from "@material-ui/core/Typography";
-import Layout from "@aragon/ui/dist/Layout";
-import Container from '@material-ui/core/Container';
+const { api } = require("./constants");
 
 // TODO: To support other wallets https://github.com/web3modal/web3modal
 const providerOptions = {};
@@ -21,6 +22,17 @@ const web3Modal = new Web3Modal({
 
 function App() {
   const [address, setAddress] = useState(null);
+
+  const login = async (address) => {
+    if (address == null) {
+      api.token = null;
+    }
+    else {
+      const t = await get(`${api.login}?address=${address}`);
+      api.token = t.data.token;
+    }
+  }
+
   useEffect(() => {
     if (web3Modal.cachedProvider) {
       web3Modal.connect().then((provider) => {
@@ -32,13 +44,20 @@ function App() {
     const web3 = new Web3(provider);
     if (web3.eth.net.isListening()) {
       web3.eth.getAccounts().then((accounts) => {
-        setAddress(accounts[0]);
+        login(accounts[0]).then(() => {
+          setAddress(accounts[0]);
+        });
       });
     }
     provider.on("accountsChanged", (accounts) => {
       if (accounts[0]) {
-        setAddress(accounts[0]);
-      } else setAddress(null);
+        login(accounts[0]).then(() => {
+          setAddress(accounts[0]);
+        });
+      } else {
+        login(null);
+        setAddress(null);
+      }
     });
   };
   return (

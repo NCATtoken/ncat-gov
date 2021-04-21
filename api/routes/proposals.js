@@ -22,8 +22,6 @@ router.get("/", async (req, res, next) => {
 router.post(
   "/",
   [
-    check("author").isString(),
-    check("author").not().isEmpty({ ignore_whitespace: true }),
     check("title").isString(),
     check("title").isLength({ max: 255 }),
     check("title").not().isEmpty({ ignore_whitespace: true }),
@@ -35,16 +33,16 @@ router.post(
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-    if (!isValidAddress(req.body.author))
+    if (!isValidAddress(req.user.address))
       next(createError(400, "Invalid address"));
     try {
       const proposal = {
+        author: req.user.address,
         title: req.body.title.trim(),
-        author: req.body.author.trim().toLowerCase(),
         content: req.body.content.trim(),
       };
       await save(proposal);
-      res.json({ message: "success" });
+      res.json({ message: "success", proposal });
     } catch (e) {
       next(e);
     }
@@ -52,7 +50,7 @@ router.post(
 );
 
 router.get("/vote", async (req, res, next) => {
-  const voter = req.query.address.trim().toLowerCase();
+  const voter = req.user.address;
   const proposalId = req.query.proposalId;
   let support = req.query.support;
   if (!["true", "false"].includes(support)) {

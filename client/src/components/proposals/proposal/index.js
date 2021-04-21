@@ -1,40 +1,21 @@
-import React from 'react';
-import { Fragment, useEffect, useState } from "react";
-import { Box, Button, Toast } from "@aragon/ui";
-import Card from "@material-ui/core/Card";
+import { Box, Button, Text, Timer } from "@aragon/ui";
+import { Divider } from '@material-ui/core';
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardHeader";
+import Collapse from '@material-ui/core/Collapse';
 import { red } from "@material-ui/core/colors";
 import IconButton from "@material-ui/core/IconButton";
+import Snackbar from '@material-ui/core/Snackbar';
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import clsx from 'clsx';
-import CardMedia from '@material-ui/core/CardMedia';
-import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { get } from "../../../adapters/xhr";
-import { Divider } from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
-import Container from '@material-ui/core/Container';
-import { Text, TextInput, Timer } from '@aragon/ui'
-import { Distribution } from 'ui'
-import Address from "../../address";
+import clsx from 'clsx';
 import { round } from 'lodash';
+import React, { Fragment } from 'react';
+import { Distribution } from 'ui';
+import { get } from "../../../adapters/xhr";
+import Address from "../../address";
 
 // import Distribution from '../../distribution'
 const { api } = require("../../../constants");
@@ -50,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "56.25%", // 16:9
   },
   box: {
-    borderRadius: "25px"
+    borderRadius: "25px",
+    textAlign: "center",
   },
   expand: {
     transform: "rotate(0deg)",
@@ -101,7 +83,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: "3px",
     height: "20px",
     lineHeight: "20px",
-    background: "linear-gradient( 190deg, #BEA5A9 -100%, #ddc7cb 80%)"
+    background: "linear-gradient( 190deg, #BEA5A9 -100%, #ddc7cb 80%)",
   },
   for: {
     color: "white",
@@ -165,13 +147,13 @@ function Proposal({ address, proposal, refresh }) {
 
   return (
     <Box className={classes.box} heading={<Fragment>
-      <h4 className={classes.title}>{proposal.title}</h4>
+      <div className={classes.title}>{proposal.title}</div>
       <div style={{ whiteSpace: "nowrap", margin: "21px 0 21px 21px" }}><h6>
         Status:
           {proposal.state === "PENDING" ?
           <span className={classes.pending}>Pending</span>
           :
-          <span className={classes.inactive}>Inactive</span>
+          <span className={clsx(classes.inactive, proposal.state === "ACCEPTED" ? classes.for : classes.against)}>{proposal.state}</span>
         }
       </h6></div>
     </Fragment>}>
@@ -189,8 +171,8 @@ function Proposal({ address, proposal, refresh }) {
         <Distribution
           heading="Votes"
           items={[
-            { item: `${round(BigNumber.from(proposal.for) / 10e17, 2).toString()}B For`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.for) / totalVotes) * 100) : 0 },
-            { item: `${round(BigNumber.from(proposal.against) / 10e17, 2).toString()}B Against`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.against) / totalVotes) * 100) : 0 }
+            { item: `${round(BigNumber.from(proposal.for) / 10e19, 2).toString()}T For`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.for) / totalVotes) * 100) : 0 },
+            { item: `${round(BigNumber.from(proposal.against) / 10e19, 2).toString()}T Against`, percentage: totalVotes > 0 ? round((BigNumber.from(proposal.against) / totalVotes) * 100) : 0 }
           ]}
           colors={["#E17992", "#425673"]}
         />
@@ -225,7 +207,7 @@ function Proposal({ address, proposal, refresh }) {
       <CardActions style={{ padding: "0" }}>
         <div className={clsx(classes.expand)}>
           <Typography variant="caption">
-            View Voters
+            View Voters ({proposal.voters.length})
           </Typography>
         </div>
 
@@ -244,16 +226,11 @@ function Proposal({ address, proposal, refresh }) {
         <CardContent style={{ padding: "0px", textAlign: "left", maxHeight: "120px", overflowY: "auto" }}>
           <Typography variant="caption">
             {proposal.voters.length > 0 ?
-              proposal.voters.map(voter => (
-                <Fragment>
+              proposal.voters.map((voter, index) => (
+                <Fragment key={index}>
                   <Address address={voter}></Address>
                   <Divider></Divider>
                 </Fragment>
-                // <TableRow key={voter}>
-                //   <TableCell>
-                //     {/* <Text style={{ fontSize: "10pt" }}>{voter}</Text> */}
-                //   </TableCell>
-                // </TableRow>
               ))
               : <Text>No voters yet</Text>
             }

@@ -14,6 +14,7 @@ const models = require("./models");
 const logger = require("./utils/logger");
 const listeners = require("./listeners");
 const jobs = require("./jobs");
+const jwtauth = require("./middleware/jwtauth");
 const accessLogStream = rfs.createStream("access.log", {
   interval: config.get("logging.rotation"),
   path: path.join(__dirname, config.get("logging.folder")),
@@ -34,8 +35,8 @@ require("./routes")(app, logger);
 
 
 // home
-app.get('/', (req, res) => {
-  res.send('Version 0.1')
+app.get('/', jwtauth, (req, res) => {
+  res.send({ version: '1.0', user: req.user });
 })
 
 // Synchronize DB

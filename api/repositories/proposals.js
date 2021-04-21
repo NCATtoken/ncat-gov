@@ -14,7 +14,7 @@ module.exports.save = (fields, transaction) => {
 
 module.exports.findAllByPage = (page, transaction, lock = false) =>
   proposals.findAll(
-    { limit: MAX_PER_PAGE, offset: page * MAX_PER_PAGE },
+    { limit: MAX_PER_PAGE, offset: page * MAX_PER_PAGE, order: [['expiration', 'asc']] },
     transaction,
     lock
   );

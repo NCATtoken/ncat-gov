@@ -1,7 +1,23 @@
 "use strict";
 
+const { request } = require('express');
+const jwt = require('jsonwebtoken');
+const jwtauth = require('../middleware/jwtauth');
+const { isValidAddress } = require("../utils/blockchain");
+const accessTokenSecret = process.env.JWT_SECRET;
+
 module.exports = (app, logger) => {
-  app.use("/proposals", require("./proposals"));
+  app.get('/login', (req, res, next) => {
+    var address = req.query.address.trim().toLowerCase();
+    if (!isValidAddress(address)) {
+      next(createError(400, "Invalid address"));
+      return;
+    }
+    var token = jwt.sign({ address: address }, accessTokenSecret);
+    res.json({ token, address });
+  });
+
+  app.use("/proposals", jwtauth, require("./proposals"));
 
   // error handler
   app.use(function (err, req, res, next) {
