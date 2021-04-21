@@ -1,40 +1,21 @@
-import React from 'react';
-import { Fragment, useEffect, useState } from "react";
-import { Box, Button, Toast } from "@aragon/ui";
-import Card from "@material-ui/core/Card";
+import { Box, Button, Text, Timer } from "@aragon/ui";
+import { Divider } from '@material-ui/core';
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardHeader";
+import Collapse from '@material-ui/core/Collapse';
 import { red } from "@material-ui/core/colors";
 import IconButton from "@material-ui/core/IconButton";
+import Snackbar from '@material-ui/core/Snackbar';
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
-import ThumbDownIcon from "@material-ui/icons/ThumbDown";
-import ThumbUpIcon from "@material-ui/icons/ThumbUp";
-import clsx from 'clsx';
-import CardMedia from '@material-ui/core/CardMedia';
-import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
-import FavoriteIcon from '@material-ui/icons/Favorite';
-import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { get } from "../../../adapters/xhr";
-import { Divider } from '@material-ui/core';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
-import Paper from '@material-ui/core/Paper';
-import Container from '@material-ui/core/Container';
-import { Text, TextInput, Timer } from '@aragon/ui'
-import { Distribution } from 'ui'
-import Address from "../../address";
+import clsx from 'clsx';
 import { round } from 'lodash';
+import React, { Fragment } from 'react';
+import { Distribution } from 'ui';
+import { get } from "../../../adapters/xhr";
+import Address from "../../address";
 
 // import Distribution from '../../distribution'
 const { api } = require("../../../constants");
@@ -50,7 +31,8 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: "56.25%", // 16:9
   },
   box: {
-    borderRadius: "25px"
+    borderRadius: "25px",
+    textAlign: "center",
   },
   expand: {
     transform: "rotate(0deg)",

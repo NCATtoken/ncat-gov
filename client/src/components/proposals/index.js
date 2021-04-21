@@ -1,26 +1,21 @@
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
-import { useState, useEffect, useRef } from "react";
+import { Button, TextInput, ContextMenu, ContextMenuItem } from '@aragon/ui';
+import { Backdrop, Typography, CircularProgress, Divider } from '@material-ui/core';
+import Hidden from '@material-ui/core/Hidden';
+import Box from '@material-ui/core/Box';
+import Fade from '@material-ui/core/Fade';
+import Grid from '@material-ui/core/Grid';
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import Modal from '@material-ui/core/Modal';
+import Snackbar from '@material-ui/core/Snackbar';
+import { makeStyles } from '@material-ui/core/styles';
+import MuiAlert from '@material-ui/lab/Alert';
+import _ from "lodash";
+import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { post, get } from "../../adapters/xhr";
-import Loading from "../loading";
-import Message from "../message";
+import { get, post } from "../../adapters/xhr";
 import "./index.css";
 import Proposal from "./proposal";
-import { TextInput, Button, LoadingRing } from '@aragon/ui'
-import { makeStyles } from '@material-ui/core/styles';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Fade from '@material-ui/core/Fade';
-import GridList from '@material-ui/core/GridList';
-import withWidth, { isWidthUp } from '@material-ui/core/withWidth';
-import GridListTile from '@material-ui/core/GridListTile';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import _ from "lodash"
-import { Divider } from '@material-ui/core';
 
 const { api } = require("../../constants");
 
@@ -83,6 +78,12 @@ function Proposals({ address }) {
   const [hasMore, setHasMore] = useState(true);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openError, setOpenError] = useState(false);
+  const [statusFilter, _setStatusFilter] = useState('on-going')
+
+  const setStatusFilter = (v) => {
+    _setStatusFilter(v);
+
+  };
 
   useEffect(() => {
     fetchData();
@@ -157,6 +158,7 @@ function Proposals({ address }) {
   const saveProposal = async (proposal) => {
     try {
       await post(`${api.proposals}`, proposal);
+      setStatusFilter('on-going');
       setOpenSuccess(true)
     } catch (error) {
       setErr(error.message);
@@ -168,11 +170,24 @@ function Proposals({ address }) {
 
   return (
     <div className="Proposals" ref={componentRef}>
-      <NewProposalModal address={address} saveProposal={saveProposal} />
-      <Divider style={{ margin: "1em auto" }}></Divider>
-      <Typography variant="h6" className={classes.header} gutterBottom>
-        Proposals
+
+      <Grid container justify="flex-end" alignItems="center">
+        <Box style={{ 'margin-left': '1em' }}>
+          <NewProposalModal address={address} saveProposal={saveProposal} />
+        </Box>
+        <Box style={{ 'margin-left': '1em' }}>
+          <ContextMenu>
+            <ContextMenuItem onClick={() => { setStatusFilter('on-going'); }}>On-going</ContextMenuItem>
+            <ContextMenuItem onClick={() => { setStatusFilter('ended'); }}>Ended</ContextMenuItem>
+          </ContextMenu>
+        </Box>
+      </Grid>
+
+      <Divider style={{ 'margin': '1em 0' }}></Divider>
+      <Typography variant="h6" className={classes.header} style={{ textAlign: 'center', textTransform: 'capitalize' }}>
+        {statusFilter} Proposals
       </Typography>
+
       <InfiniteScroll
         dataLength={proposals.length}
         next={fetchData}
@@ -180,13 +195,18 @@ function Proposals({ address }) {
         loader={<CircularProgress />}
         style={{ height: "default", overflow: "hidden" }}
         endMessage={
-          <Typography style={{ color: "#64618B", margin: "1em 0" }} gutterBottom>
+          <Typography style={{ color: "#64618B", margin: "1em 0", textAlign: "center" }} gutterBottom>
             No more proposals.
           </Typography>
         }
       >
         <GridList cellHeight={"auto"} style={{ overflow: "hidden" }} cols={getGridListCols()}>
-          {proposals.map((proposal, index) => (
+          {proposals.filter((p) => {
+            if (statusFilter == 'on-going')
+              return (p.state == 'PENDING');
+            else
+              return (p.state !== 'PENDING');
+          }).map((proposal, index) => (
             <GridListTile style={{ padding: "10px", overflow: "visible" }} key={index} cols={1}>
               <Proposal
                 key={index}
@@ -212,7 +232,7 @@ function Proposals({ address }) {
           Error: {err}
         </Alert>
       </Snackbar>
-    </div>
+    </div >
   );
 }
 
@@ -241,7 +261,7 @@ function NewProposalModal({ address, saveProposal }) {
 
   return (
     <>
-      <Button className={classes.create} style={{ fontWeight: 800 }} onClick={open}>Create new proposal</Button>
+      <Button className={classes.create} style={{ fontWeight: 800 }} onClick={open}>New Proposal</Button>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

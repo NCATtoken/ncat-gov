@@ -1,6 +1,5 @@
-import Typography from "@material-ui/core/Typography";
-import { Fragment, useEffect, useState } from "react";
-
+import { IdentityBadge } from '@aragon/ui'
+import { Fragment } from "react";
 // TODO: Web Design
 function Address({ address }) {
   var display = address === null ? '' : (address.substr(0, 6) + "..." + address.substr(-4, 4));
